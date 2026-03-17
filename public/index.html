@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DNA x TiK Liikuntahaaste</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #fc4c02;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 32px 16px;
+    }
+
+    .label {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      opacity: 0.75;
+    }
+
+    .km-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .km {
+      font-size: 7rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .unit {
+      font-size: 2.5rem;
+      font-weight: 400;
+      opacity: 0.8;
+    }
+
+    .since {
+      font-size: 0.95rem;
+      opacity: 0.65;
+    }
+
+    .updated {
+      font-size: 0.8rem;
+      opacity: 0.45;
+      margin-top: 8px;
+    }
+
+    .progress-wrap {
+      width: min(480px, 90vw);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 12px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: white;
+      border-radius: 6px;
+      width: 0%;
+      transition: width 1s ease;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      opacity: 0.75;
+    }
+
+    .leaderboard {
+      width: min(480px, 90vw);
+      margin-top: 8px;
+    }
+
+    .leaderboard-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.65;
+      margin-bottom: 8px;
+    }
+
+    .athlete-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      font-size: 0.95rem;
+    }
+
+    .athlete-row:last-child { border-bottom: none; }
+
+    .athlete-km {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+  <div class="label">DNA x TiK Liikuntahaaste</div>
+  <div class="km-row">
+    <span class="km" id="km">—</span>
+    <span class="unit">km</span>
+  </div>
+  <div class="since">Since March 1, 2026</div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-label">
+      <span id="progress-text">0 / 30 000 km</span>
+      <span id="progress-pct">0 %</span>
+    </div>
+  </div>
+  <div class="updated" id="updated"></div>
+  <div class="leaderboard" id="leaderboard" style="display:none">
+    <div class="leaderboard-title">Leaderboard</div>
+    <div id="athlete-list"></div>
+  </div>
+
+  <script>
+    const GOAL = 30000;
+    const fmt = (n, d = 1) =>
+      n.toLocaleString('fi-FI', { minimumFractionDigits: d, maximumFractionDigits: d });
+
+    fetch('/api/stats')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.error) {
+          document.getElementById('km').textContent = '?';
+          document.getElementById('updated').textContent = data.error;
+          return;
+        }
+
+        const total = data.grandTotalKm;
+        document.getElementById('km').textContent = fmt(total);
+
+        const pct = Math.min((total / GOAL) * 100, 100);
+        document.getElementById('progress-fill').style.width = pct + '%';
+        document.getElementById('progress-text').textContent = fmt(total) + ' / 30 000 km';
+        document.getElementById('progress-pct').textContent = fmt(pct) + ' %';
+
+        if (data.lastUpdated) {
+          document.getElementById('updated').textContent =
+            'Updated ' + new Date(data.lastUpdated).toLocaleString('fi-FI');
+        }
+
+        if (data.athletes && data.athletes.length > 0) {
+          const list = document.getElementById('athlete-list');
+          for (const a of data.athletes) {
+            const row = document.createElement('div');
+            row.className = 'athlete-row';
+            row.innerHTML =
+              `<span>${a.name}</span><span class="athlete-km">${fmt(a.totalKm)} km</span>`;
+            list.appendChild(row);
+          }
+          document.getElementById('leaderboard').style.display = 'block';
+        }
+      })
+      .catch(() => {
+        document.getElementById('km').textContent = '?';
+        document.getElementById('updated').textContent = 'Could not load data';
+      });
+  </script>
+</body>
+</html>
