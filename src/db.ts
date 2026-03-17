@@ -38,7 +38,7 @@ export async function recordActivitiesBatch(
     .onConflictDoNothing();
 }
 
-const CHALLENGE_START = new Date('2026-04-01');
+const CHALLENGE_START = new Date('2026-03-01');
 
 export async function getStats() {
   const where = and(gte(activities.firstSeen, CHALLENGE_START), gt(activities.km, '0'));
