@@ -163,9 +163,9 @@
         document.getElementById('progress-text').textContent = fmt(total) + ' / 30 000 km';
         document.getElementById('progress-pct').textContent = fmt(pct) + ' %';
 
-        if (data.lastUpdated) {
+        if (data.lastFetchAttempt) {
           document.getElementById('updated').textContent =
-            'Updated ' + new Date(data.lastUpdated).toLocaleString('fi-FI');
+            'Updated ' + new Date(data.lastFetchAttempt).toLocaleString('fi-FI');
         }
 
         if (data.athletes && data.athletes.length > 0) {

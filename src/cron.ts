@@ -2,7 +2,10 @@ import cron from 'node-cron';
 import { fetchClubActivities, hashActivity } from './client';
 import { getSeenHashes, recordActivitiesBatch } from './db';
 
+export let lastFetchAttempt: Date | null = null;
+
 export async function runFetch(): Promise<void> {
+  lastFetchAttempt = new Date();
   const clubId = process.env.CLUB_ID;
   if (!clubId) {
     console.error('[Cron] CLUB_ID not set.');
