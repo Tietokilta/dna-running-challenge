@@ -15,7 +15,7 @@ export interface Activity {
 export function hashActivity(activity: Activity): string {
   const first = activity.athlete?.firstname ?? '';
   const last = activity.athlete?.lastname ?? '';
-  const dist = String(Math.round(activity.distance ?? 0));
+  const dist = String(activity.distance ?? 0);
   const elapsed = String(activity.elapsed_time ?? 0);
   const sport = activity.sport_type ?? activity.type ?? 'unknown';
   const raw = [first, last, dist, elapsed, sport].join('\0');
