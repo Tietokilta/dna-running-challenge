@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { inArray, gt, gte, and, max, sql } from 'drizzle-orm';
+import { inArray, gt, gte, lt, and, max, sql } from 'drizzle-orm';
 import { activities } from './schema';
 
 const pool = new Pool({
@@ -38,10 +38,14 @@ export async function recordActivitiesBatch(
     .onConflictDoNothing();
 }
 
-const CHALLENGE_START = new Date('2026-03-01');
+import { CHALLENGE_START, CHALLENGE_END } from './constants';
 
 export async function getStats() {
-  const where = and(gte(activities.firstSeen, CHALLENGE_START), gt(activities.km, '0'));
+  const where = and(
+    gte(activities.firstSeen, CHALLENGE_START),
+    lt(activities.firstSeen, CHALLENGE_END),
+    gt(activities.km, '0'),
+  );
 
   const [statsRows, lastRows] = await Promise.all([
     db
