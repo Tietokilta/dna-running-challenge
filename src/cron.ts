@@ -25,6 +25,7 @@ export async function runFetch(): Promise<void> {
         hash,
         athleteName: `${activity.athlete?.firstname ?? '?'} ${activity.athlete?.lastname ?? '?'}`,
         km: (activity.distance ?? 0) / 1000,
+        rawData: activity,
       }));
 
     await recordActivitiesBatch(toRecord);

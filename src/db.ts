@@ -29,12 +29,12 @@ export async function getSeenHashes(hashes: string[]): Promise<Set<string>> {
 }
 
 export async function recordActivitiesBatch(
-  records: Array<{ hash: string; athleteName: string; km: number }>,
+  records: Array<{ hash: string; athleteName: string; km: number; rawData?: unknown }>,
 ): Promise<void> {
   if (records.length === 0) return;
   await db
     .insert(activities)
-    .values(records.map((r) => ({ hash: r.hash, athleteName: r.athleteName, km: String(r.km) })))
+    .values(records.map((r) => ({ hash: r.hash, athleteName: r.athleteName, km: String(r.km), rawData: r.rawData })))
     .onConflictDoNothing();
 }
 

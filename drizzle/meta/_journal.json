@@ -8,6 +8,13 @@
       "when": 1773770826230,
       "tag": "0000_charming_serpent_society",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1773851013120,
+      "tag": "0001_striped_vertigo",
+      "breakpoints": true
     }
   ]
 }
